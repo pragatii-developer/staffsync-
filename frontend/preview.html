@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>StaffSync Aura — Enterprise Sidebar HRM</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f4f6fb; color: #0f172a; }
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar { width: 265px; background: linear-gradient(180deg, #1e1b4b 0%, #0f172a 100%); color: #fff; padding: 22px 16px; display: flex; flex-direction: column; }
+  .brand { display: flex; align-items: center; gap: 12px; padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,0.14); }
+  .brand-badge { width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #6366f1, #a855f7); display: grid; place-items: center; font-weight: 800; font-size: 16px; }
+  .nav-btn { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: transparent; color: rgba(255,255,255,0.78); border: none; padding: 11px 14px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 5px; }
+  .nav-btn.active, .nav-btn:hover { background: rgba(99, 102, 241, 0.28); color: #fff; border-left: 4px solid #818cf8; }
+  .main { flex: 1; display: flex; flex-direction: column; }
+  .topbar { background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 14px 28px; display: flex; justify-content: space-between; align-items: center; }
+  .role-pill { background: #eef2ff; color: #4f46e5; padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 13px; }
+  .content { padding: 26px 30px; }
+  .hero-card { background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%); color: #fff; border-radius: 16px; padding: 24px 28px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 12px 24px rgba(79,70,229,0.18); }
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 22px; }
+  .kpi-card { background: #fff; border: 1px solid #e2e8f0; border-left: 5px solid #4f46e5; border-radius: 14px; padding: 18px; box-shadow: 0 4px 12px rgba(15,23,42,0.04); }
+  .kpi-val { font-size: 28px; font-weight: 800; color: #4f46e5; margin: 6px 0 4px; }
+  .grid-2 { display: grid; grid-template-columns: 1.55fr 1fr; gap: 18px; }
+  .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; box-shadow: 0 4px 12px rgba(15,23,42,0.04); }
+  table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13.5px; }
+  th { text-align: left; padding: 10px; border-bottom: 2px solid #e2e8f0; color: #475569; font-weight: 700; }
+  td { padding: 11px 10px; border-bottom: 1px solid #f1f5f9; }
+  .badge { padding: 4px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+  .bg-ok { background: #d1fae5; color: #065f46; }
+  .bg-pend { background: #fef3c7; color: #92400e; }
+  .bg-info { background: #e0e7ff; color: #3730a3; }
+  .kanban { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 12px; }
+  .kanban-col { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; }
+  .kanban-item { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-badge">SS</div>
+      <div>
+        <div style="font-weight:800;font-size:18px;">StaffSync</div>
+        <div style="font-size:11px;opacity:0.7;">VARIANT 1: AURA INDIGO UI</div>
+      </div>
+    </div>
+    <button class="nav-btn active" id="nav-home" onclick="showTab('home')">🏠 Home &amp; Demo Links</button>
+    <button class="nav-btn" id="nav-hr" onclick="showTab('hr')">🏢 HR Command Center</button>
+    <button class="nav-btn" id="nav-mgr" onclick="showTab('mgr')">📊 Manager Workspace</button>
+    <button class="nav-btn" id="nav-emp" onclick="showTab('emp')">👤 Employee Dashboard</button>
+    <button class="nav-btn" id="nav-leaves" onclick="showTab('leaves')">🗓️ Leave Kanban Board</button>
+    <button class="nav-btn" id="nav-att" onclick="showTab('att')">⏱️ Attendance &amp; Shifts</button>
+    <div style="margin-top:auto;padding-top:14px;border-top:1px solid rgba(255,255,255,0.15);font-size:12px;">
+      <div style="opacity:0.75;margin-bottom:6px;">JWT RBAC Role Active:</div>
+      <div id="role-indicator" style="font-weight:700;color:#a5b4fc;">HR Administrator (Ananya Verma)</div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <span class="role-pill" id="top-role">Role: HR Admin</span>
+        <span style="margin-left:10px;color:#475569;font-size:13.5px;">MERN Stack HRM &bull; JWT + bcryptjs + 8 MongoDB Collections Verified</span>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <span class="badge bg-info">🌐 Demo: staffsync-hrm-demo.vercel.app</span>
+        <span class="badge bg-ok">💻 GitHub: Parth07072006/StaffSync-HRM-MERN</span>
+      </div>
+    </header>
+    <div class="content" id="view-container"></div>
+  </div>
+</div>
+<script>
+const views = {
+  home: `
+    <div class="hero-card">
+      <div>
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;opacity:0.85;">UI Variant 1 — Indigo Sidebar Enterprise Layout</div>
+        <h2 style="font-size:24px;margin:6px 0;">StaffSync — Modern Human Resource Management Solution</h2>
+        <p style="font-size:14px;opacity:0.9;max-width:680px;">Centralized MERN Stack HRM platform streamlining Employee records, daily Attendance check-ins, Leave Kanban workflows, Manager reviews, and Training programs.</p>
+      </div>
+      <div style="background:rgba(255,255,255,0.14);padding:14px 18px;border-radius:12px;min-width:250px;">
+        <div style="font-size:12px;font-weight:700;margin-bottom:6px;">🔗 Mentor Evaluation Links</div>
+        <div style="font-size:12px;opacity:0.95;">Demo: https://staffsync-hrm-demo.vercel.app</div>
+        <div style="font-size:12px;opacity:0.95;margin-top:4px;">Repo: github.com/Parth07072006/StaffSync</div>
+      </div>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi-card"><div style="font-size:12px;color:#64748b;">Total Active Staff</div><div class="kpi-val">48</div><div style="font-size:12px;color:#10b981;">100% Verified Profiles</div></div>
+      <div class="kpi-card"><div style="font-size:12px;color:#64748b;">Today's Attendance</div><div class="kpi-val">94.2%</div><div style="font-size:12px;color:#4f46e5;">45 Checked-In On Time</div></div>
+      <div class="kpi-card"><div style="font-size:12px;color:#64748b;">Leave Requests</div><div class="kpi-val">2 Pending</div><div style="font-size:12px;color:#f59e0b;">Multi-Role Approval Queue</div></div>
+      <div class="kpi-card"><div style="font-size:12px;color:#64748b;">Active Trainings</div><div class="kpi-val">6 Cohorts</div><div style="font-size:12px;color:#10b981;">88.5% Avg Completion</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="font-size:16px;">Employee &amp; Manager Directory (MongoDB Indexed)</h3>
+        <table>
+          <thead><tr><th>Code</th><th>Name</th><th>Department</th><th>Designation</th><th>KPI Score</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><strong>EMP-1041</strong></td><td>Parth Dubey</td><td>Engineering</td><td>Full Stack MERN Dev</td><td>95%</td><td><span class="badge bg-ok">Active</span></td></tr>
+            <tr><td><strong>EMP-1042</strong></td><td>Ishita Nair</td><td>Product Design</td><td>Senior UI/UX Designer</td><td>91%</td><td><span class="badge bg-ok">Active</span></td></tr>
+            <tr><td><strong>EMP-1043</strong></td><td>Kabir Deshmukh</td><td>Engineering</td><td>Backend Node.js Dev</td><td>89%</td><td><span class="badge bg-ok">Active</span></td></tr>
+            <tr><td><strong>MGR-201</strong></td><td>Rohan Kulkarni</td><td>Engineering</td><td>Engineering Manager</td><td>96%</td><td><span class="badge bg-info">Manager</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3 style="font-size:16px;">Pinned HR Announcements</h3>
+        <div style="margin-top:12px;padding:12px;background:#f8fafc;border-left:4px solid #4f46e5;border-radius:8px;">
+          <div style="font-weight:700;font-size:13.5px;">📌 Diwali Bonus &amp; Q4 Townhall Schedule</div>
+          <div style="font-size:12.5px;color:#475569;margin-top:4px;">All full-time employees will receive the Q4 performance bonus with October payroll.</div>
+        </div>
+        <div style="margin-top:10px;padding:12px;background:#f8fafc;border-left:4px solid #10b981;border-radius:8px;">
+          <div style="font-weight:700;font-size:13.5px;">📌 Hybrid Work &amp; Attendance Policy 2026</div>
+          <div style="font-size:12.5px;color:#475569;margin-top:4px;">Log up to 8 remote workdays per quarter via the StaffSync Attendance module.</div>
+        </div>
+      </div>
+    </div>
+  `,
+  hr: `
+    <h2 style="font-size:21px;margin-bottom:14px;">🏢 HR Executive Command Center &amp; Analytics</h2>
+    <div class="kpi-row">
+      <div class="kpi-card"><div style="font-size:12px;color:#64748b;">Workforce Headcount</div><div class="kpi-val">48 Staff</div><div style="font-size:12px;color:#10b981;">Across 4 Departments</div></div>
+      <div class="kpi-card"><div style="font-size:12px;color:#64748b;">Department Managers</div><div class="kpi-val">6 Leads</div><div style="font-size:12px;color:#4f46e5;">4.8/5.0 Avg Team Rating</div></div>
+      <div class="kpi-card"><div style="font-size:12px;color:#64748b;">Monthly Payroll Ledger</div><div class="kpi-val">₹42.6L</div><div style="font-size:12px;color:#10b981;">Automated Disbursement</div></div>
+      <div class="kpi-card"><div style="font-size:12px;color:#64748b;">API Response Latency</div><div class="kpi-val">6.4 ms</div><div style="font-size:12px;color:#4f46e5;">Compound MongoDB Indexes</div></div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:16px;">Organization-Wide Employee &amp; Manager Audit Table</h3>
+      <table>
+        <thead><tr><th>ID</th><th>Full Name</th><th>Email</th><th>Role Tier</th><th>Department</th><th>Salary</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>EMP-1041</td><td>Parth Dubey</td><td>parth.dubey@staffsync.io</td><td>Employee</td><td>Engineering</td><td>₹95,000</td><td><span class="badge bg-ok">Active</span></td></tr>
+          <tr><td>EMP-1042</td><td>Ishita Nair</td><td>ishita.nair@staffsync.io</td><td>Employee</td><td>Product Design</td><td>₹88,000</td><td><span class="badge bg-ok">Active</span></td></tr>
+          <tr><td>EMP-1044</td><td>Meera Joshi</td><td>meera.joshi@staffsync.io</td><td>Employee</td><td>Quality Assurance</td><td>₹82,000</td><td><span class="badge bg-pend">On Leave</span></td></tr>
+          <tr><td>MGR-201</td><td>Rohan Kulkarni</td><td>rohan.manager@staffsync.io</td><td>Manager</td><td>Engineering</td><td>₹1,35,000</td><td><span class="badge bg-info">Active</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  `,
+  mgr: `
+    <h2 style="font-size:21px;margin-bottom:14px;">📊 Manager Team Supervision, Leave Review &amp; Trainings</h2>
+    <div class="kpi-row">
+      <div class="kpi-card"><div style="font-size:12px;color:#64748b;">Supervised Squad</div><div class="kpi-val">12 Engineers</div><div style="font-size:12px;color:#4f46e5;">Rohan Kulkarni's Team</div></div>
+      <div class="kpi-card"><div style="font-size:12px;color:#64748b;">Pending Leave Approvals</div><div class="kpi-val">2 Requests</div><div style="font-size:12px;color:#f59e0b;">Action Required Today</div></div>
+      <div class="kpi-card"><div style="font-size:12px;color:#64748b;">Team Performance KPI</div><div class="kpi-val">92.8%</div><div style="font-size:12px;color:#10b981;">Top Quartile Velocity</div></div>
+      <div class="kpi-card"><div style="font-size:12px;color:#64748b;">Active Training Tracks</div><div class="kpi-val">3 Cohorts</div><div style="font-size:12px;color:#4f46e5;">MERN &amp; Cloud Security</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <h3 style="font-size:16px;">Leave Approval Queue (Manager RBAC Protected)</h3>
+        <table>
+          <thead><tr><th>Employee</th><th>Type</th><th>Dates</th><th>Reason</th><th>Decision</th></tr></thead>
+          <tbody>
+            <tr><td>Meera Joshi</td><td>Sick Leave</td><td>Oct 26 – Oct 27</td><td>Medical checkup</td><td><span class="badge bg-ok">✓ Approved</span></td></tr>
+            <tr><td>Kabir Deshmukh</td><td>Work From Home</td><td>Nov 10 – Nov 12</td><td>Broadband upgrade</td><td><span class="badge bg-pend">Pending Review</span></td></tr>
+            <tr><td>Parth Dubey</td><td>Casual Leave</td><td>Nov 04 – Nov 05</td><td>Family festival</td><td><span class="badge bg-ok">✓ Approved</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3 style="font-size:16px;">Assigned Team Training Programs</h3>
+        <div style="margin-top:12px;padding:12px;border:1px solid #e2e8f0;border-radius:10px;">
+          <div style="font-weight:700;">🎓 Advanced MERN &amp; Microservices Scaling</div>
+          <div style="font-size:12px;color:#64748b;margin:4px 0;">Instructor: Rohan Kulkarni &bull; 16 Hours &bull; 85% Completed</div>
+        </div>
+        <div style="margin-top:10px;padding:12px;border:1px solid #e2e8f0;border-radius:10px;">
+          <div style="font-weight:700;">🎓 Enterprise Security: JWT, RBAC &amp; OWASP</div>
+          <div style="font-size:12px;color:#64748b;margin:4px 0;">Instructor: Siddharth Mehta &bull; 10 Hours &bull; 78% Completed</div>
+        </div>
+      </div>
+    </div>
+  `,
+  emp: `
+    <h2 style="font-size:21px;margin-bottom:14px;">👤 Employee Self-Service Hub — Parth Dubey (EMP-1041)</h2>
+    <div class="kpi-row">
+      <div class="kpi-card"><div style="font-size:12px;color:#64748b;">Available Leave Quota</div><div class="kpi-val">24 Days</div><div style="font-size:12px;color:#4f46e5;">10 Casual &bull; 6 Sick &bull; 8 Earned</div></div>
+      <div class="kpi-card"><div style="font-size:12px;color:#64748b;">Monthly Attendance</div><div class="kpi-val">21 / 22</div><div style="font-size:12px;color:#10b981;">95.4% Punctuality Score</div></div>
+      <div class="kpi-card"><div style="font-size:12px;color:#64748b;">Performance Rating</div><div class="kpi-val">95 / 100</div><div style="font-size:12px;color:#10b981;">Exceeds Expectations</div></div>
+      <div class="kpi-card"><div style="font-size:12px;color:#64748b;">Enrolled Trainings</div><div class="kpi-val">2 Active</div><div style="font-size:12px;color:#4f46e5;">React 18 &amp; JWT Security</div></div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:16px;">Personal Profile &amp; Verified Skills Record</h3>
+      <table>
+        <thead><tr><th>Field</th><th>Verified Employee Value</th><th>Field</th><th>Verified Employee Value</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Full Name</strong></td><td>Parth Dubey (EMP-1041)</td><td><strong>Department</strong></td><td>Engineering (MERN Stack)</td></tr>
+          <tr><td><strong>Official Email</strong></td><td>parth.dubey@staffsync.io</td><td><strong>Location</strong></td><td>Indore, Madhya Pradesh, India</td></tr>
+          <tr><td><strong>Skills Certified</strong></td><td>React.js, Node.js, Express, MongoDB, Redux</td><td><strong>Reporting Manager</strong></td><td>Rohan Kulkarni (MGR-201)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  `,
+  leaves: `
+    <h2 style="font-size:21px;margin-bottom:14px;">🗓️ Interactive Leave Management &amp; Kanban Workflow Board</h2>
+    <div class="kanban">
+      <div class="kanban-col">
+        <div style="font-weight:800;color:#92400e;">⏳ PENDING REVIEW (2)</div>
+        <div class="kanban-item">
+          <div style="font-weight:700;">Kabir Deshmukh</div>
+          <div style="font-size:12px;color:#4f46e5;margin:4px 0;">Work From Home (3 Days)</div>
+          <div style="font-size:12px;color:#64748b;">Nov 10 – Nov 12 &bull; "Sprint focus &amp; fiber upgrade"</div>
+        </div>
+        <div class="kanban-item">
+          <div style="font-weight:700;">Meera Joshi</div>
+          <div style="font-size:12px;color:#4f46e5;margin:4px 0;">Sick Leave (2 Days)</div>
+          <div style="font-size:12px;color:#64748b;">Oct 26 – Oct 27 &bull; "Medical checkup"</div>
+        </div>
+      </div>
+      <div class="kanban-col">
+        <div style="font-weight:800;color:#065f46;">✓ APPROVED LEAVES (2)</div>
+        <div class="kanban-item">
+          <div style="font-weight:700;">Parth Dubey</div>
+          <div style="font-size:12px;color:#10b981;margin:4px 0;">Casual Leave (2 Days)</div>
+          <div style="font-size:12px;color:#64748b;">Nov 04 – Nov 05 &bull; Approved by Rohan Kulkarni</div>
+        </div>
+        <div class="kanban-item">
+          <div style="font-weight:700;">Ishita Nair</div>
+          <div style="font-size:12px;color:#10b981;margin:4px 0;">Earned Leave (4 Days)</div>
+          <div style="font-size:12px;color:#64748b;">Dec 01 – Dec 04 &bull; Approved by Ananya Verma</div>
+        </div>
+      </div>
+      <div class="kanban-col">
+        <div style="font-weight:800;color:#991b1b;">✕ REJECTED / RESCHEDULED (1)</div>
+        <div class="kanban-item">
+          <div style="font-weight:700;">Aarav Sharma</div>
+          <div style="font-size:12px;color:#ef4444;margin:4px 0;">Casual Leave (5 Days)</div>
+          <div style="font-size:12px;color:#64748b;">Oct 28 – Nov 01 &bull; "Production release freeze"</div>
+        </div>
+      </div>
+    </div>
+  `,
+  att: `
+    <h2 style="font-size:21px;margin-bottom:14px;">⏱️ Real-Time Attendance Punch-In &amp; Shift Logs</h2>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <h3 style="font-size:16px;">Daily Biometric &amp; Web Check-In Ledger (2026-10-26)</h3>
+        <span class="badge bg-ok">✓ Today's Shift Active: Checked In at 09:02 AM</span>
+      </div>
+      <table>
+        <thead><tr><th>Date</th><th>Employee</th><th>Department</th><th>Check-In</th><th>Check-Out</th><th>Logged Hours</th><th>Mode</th></tr></thead>
+        <tbody>
+          <tr><td>2026-10-26</td><td><strong>Parth Dubey</strong></td><td>Engineering</td><td>09:02 AM</td><td>06:15 PM</td><td>9.2 hrs</td><td><span class="badge bg-ok">Present (Office)</span></td></tr>
+          <tr><td>2026-10-26</td><td><strong>Ishita Nair</strong></td><td>Product Design</td><td>09:14 AM</td><td>06:05 PM</td><td>8.8 hrs</td><td><span class="badge bg-ok">Present (Office)</span></td></tr>
+          <tr><td>2026-10-26</td><td><strong>Kabir Deshmukh</strong></td><td>Engineering</td><td>09:30 AM</td><td>06:30 PM</td><td>9.0 hrs</td><td><span class="badge bg-info">Remote WFH</span></td></tr>
+          <tr><td>2026-10-25</td><td><strong>Parth Dubey</strong></td><td>Engineering</td><td>08:58 AM</td><td>06:10 PM</td><td>9.2 hrs</td><td><span class="badge bg-ok">Present (Office)</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  `
+};
+
+function showTab(key) {
+  document.getElementById('view-container').innerHTML = views[key];
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('nav-' + key);
+  if (btn) btn.classList.add('active');
+}
+showTab('home');
+</script>
+</body>
+</html>
